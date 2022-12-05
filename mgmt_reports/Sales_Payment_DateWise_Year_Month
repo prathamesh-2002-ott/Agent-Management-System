@@ -1,0 +1,55 @@
+SELECT *
+							
+					FROM 
+					(SELECT  
+							year(bill_date) AS bill_year,
+
+
+                    
+	
+							SUM(bill_amount ) AS total_bill_amount
+							
+					FROM txt_bill_entry 
+					WHERE delete_tag='FALSE'   AND bill_date>='2020-04-01'  AND bill_date<='2021-03-31'  GROUP BY bill_year 
+					ORDER BY bill_year  ) AS t1 
+
+					LEFT JOIN 
+					(SELECT SUM(discount_amount) AS total_discount, 
+					SUM(gr_amount) AS total_gr, 
+					SUM(payment_amount) AS total_payment, 
+					year(voucher_date) AS pay_year
+			FROM txt_payment_entry_main  
+			
+			WHERE delete_tag='FALSE'     
+			  AND voucher_date>='2020-04-01'  AND voucher_date<='2021-03-31'  GROUP BY  pay_year  
+		ORDER BY  pay_year  ) AS t2 
+
+					ON bill_year=pay_year 
+
+
+
+					SELECT *
+							
+					FROM 
+					(SELECT  
+							YEAR(bill_date) AS bill_year,
+							MONTH(bill_date) AS bill_month,
+							SUM(bill_amount ) AS total_bill_amount
+							
+					FROM txt_bill_entry 
+					WHERE delete_tag='FALSE'   AND bill_date>='2020-04-01'  AND bill_date<='2021-03-31'  GROUP BY bill_year,bill_month
+					ORDER BY bill_year,bill_month  ) AS t1 
+
+					LEFT JOIN 
+					(SELECT SUM(discount_amount) AS total_discount, 
+					SUM(gr_amount) AS total_gr, 
+					SUM(payment_amount) AS total_payment, 
+					YEAR(voucher_date) AS pay_year,
+					MONTH(voucher_date) AS pay_month
+			FROM txt_payment_entry_main  
+			
+			WHERE delete_tag='FALSE'     
+			  AND voucher_date>='2020-04-01'  AND voucher_date<='2021-03-31'  GROUP BY  pay_year  ,pay_month
+		ORDER BY  pay_year,pay_month  ) AS t2 
+
+					ON bill_year=pay_year AND bill_month=pay_month
